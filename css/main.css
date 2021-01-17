@@ -1,9 +1,31 @@
 path {
     fill: #4b5563;
-    stroke: #4b5563;
-    stroke-width: 1.5px;
+    /* stroke: #4b5563;
+    stroke-width: 1.5px; */
 }
 
 circle {
     fill: rgba(255,255,255, 0.1)
+}
+
+#landscape {
+    /* position:absolute; */
+    /* right:0; */
+}
+
+#big-date {
+    font-size: x-large;
+    position:fixed;
+    bottom:500;
+    color: #6b7a8e;
+}
+
+#tweet-text {
+    color: #8c95a6;
+    position: fixed;
+    right:0;
+    margin-left: 350px;
+    font-size: 2rem;
+    z-index: -1;
+    line-height: 1.75rem;
 }
