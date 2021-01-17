@@ -62,64 +62,73 @@ d3.csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vRLUBo-PM3Qsh_JH0rloZozD
         let parseTime = d3.timeParse('%B %d, %Y at %I:%M%p')
         twd.forEach(element => {
            element.date = parseTime(element.datetime) 
+           element.r = element.text.length/10.0
+           element.x = xs(d.date)
+           element.y = -50
         });
     })
  
     callBirds = function() {
         
+            const isReply = function(d) {
+                return d.text.startsWith('@')
+            }
+
             birds = d3.select('#landscape').selectAll('.bird')
                 .data(twd)
                 .enter()
                 .append('circle')
-                .attr('cy', d=>1.4 * (d.date < date280 ? d.text.length : d.text.length / 2))
-                // .attr('cy', d=>Math.random()*255 + 350)
-                // .attr('cy', 150)
+                .attr('cy', -100)
 
 
-                // .attr('cx', d=>xs(parseTime(d.datetime))-w)
-                .attr('cx', 50)
+                // .attr('x', d=>{ return xs(d.date) })
+                .attr('cx', d=>{ return d.x })
 
-                .attr('r', 3)
-                .attr('r', d=>d.text.length/60.0)
-                .attr('r', d=>d.text.length/25.0)
+                // .attr('r', 3)
+                // .attr('r', d=>d.text.length/60.0)
+                .attr('r', d=>d.r)
                 .attr('class', 'bird')
 
-                .style('fill', d=>d.text.startsWith('@') ? 'transparent': 'rgba(255, 255, 255, 0.6)')
-                .style('stroke', '#fff')
-                .style('stroke-width', '1')
+                .style('fill', d=>d.text.startsWith('@') ? 'rgba(255, 255, 255, 0.4)': 'rgba(255, 255, 255, 1.0)')
+                .style('stroke', '#999')
+                .style('stroke-width', '0')
                 .on('mouseover', function(d) {
                     d3.select('#tweet-text').text(d.text).transition().duration(1000)
-                        // .style('opacity', 1)
-                        .style('margin-top', '0px')
+                        .style('margin-top', '150px')
                     // d3.selectAll('.bird').style('z-index', e=> e == d ? 2: -1)
-                    d3.select(this).style('stroke', '#1da1f2')
+                    d3.select(this).raise().style('stroke-width', '2')
                 })
-                .on('mouseout', d => {
-                    d3.select('#tweet-text').transition().duration(1000)
-                        // .style('opacity', 0)//.text('')
-                        .style('margin-top', '500px')
-
-                    // d3.select(this).style('stroke', 'initial')
-                    d3.selectAll('.bird').style('stroke', '#fff').style('z-index', 0)
+                .on('mouseout', function(d) {
+                    d3.select('#tweet-text').transition().duration(1000).style('margin-top', '500px')
+                    d3.select(this).style('stroke-width', '0')//.style('z-index', 0)
                 })
                 .on('click', d => {
-                    console.log(d)
                     window.open(d.url)
                 })
 
+            simulation = d3.forceSimulation(twd)
+                .velocityDecay(0.2)
+                .force("x", d3.forceX(d=>{ return xs(d.date) }))
+                .force("y", d3.forceY().strength(d => isReply(d) ? 0.02 : 0.2))
+                .force("collide", d3.forceCollide().radius(d => d.r - 1).iterations(2))
+                .on("tick", function() {
+                    d3.selectAll('.bird').attr('cx', d=>d.x).attr('cy', d=>d.y)
+                });
 
-            delay = 2.0
-            duration = 1000.0
-            birds // fly in
-                .transition()
-                .duration((_,i)=>duration + Math.random()*500)
-                // .delay((d,i)=>delay / d.text.length - i)
-                // .delay((d,i)=>delay * (twd.length - i))
-                .delay((d,i)=>delay * i)
+          
 
-                .attr('cx', d=>{
-                    return xs(d.date)
-                })
+            // delay = 2.0
+            // duration = 1000.0
+            // birds // fly in
+            //     .transition()
+            //     .duration((_,i)=>duration + Math.random()*500)
+            //     // .delay((d,i)=>delay / d.text.length - i)
+            //     // .delay((d,i)=>delay * (twd.length - i))
+            //     .delay((d,i)=>delay * i)
+
+            //     .attr('cx', d=>{
+            //         return xs(d.date)
+            //     })
 
 
                 // .attr('cy', d=>d.text.length + 350)

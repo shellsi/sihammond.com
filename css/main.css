@@ -27,5 +27,6 @@ circle {
     margin-left: 350px;
     font-size: 2rem;
     z-index: -1;
-    line-height: 1.75rem;
+    line-height: 1.9rem;
+    font-weight: 200;
 }
