@@ -44,17 +44,16 @@ d3.csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vRLUBo-PM3Qsh_JH0rloZozD
 
         // d3.select('#g').append('path').attr('d', fn_m(w)).style('fill', 'red')
 
-        for(d of w){
-            // console.log(d)
-            d3.select('#g').append('circle')
-            .attr('cy', ys(d['Weight kg']))
-            .attr('cx', xs(scalesParseTime(d['Date']).getTime()))
-            .attr("r", 6)
-        }
+        // for(d of w){
+        //     // console.log(d)
+        //     d3.select('#g').append('circle')
+        //     .attr('cy', ys(d['Weight kg']))
+        //     .attr('cx', xs(scalesParseTime(d['Date']).getTime()))
+        //     .attr("r", 6)
+        // }
         // w.push({'Weight kg':60, 'Date': d3.timeFormat("%d/%m/%Y %H:%M:%S")(Date.now()), 'Fat %':0})
         // w.push({'Weight kg':60, 'Date': w[0]['Date'], 'Fat %':0})
         // w.push({'Weight kg':w[0]['Weight kg'], 'Date': w[0]['Date'], 'Fat %':0})
-        // callBirds()
     })
 
     d3.csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vTylGf2sPc5uFiAsXnCR6QarCBu73yJiJ32_uvV3Z0JvB-FauMhsEx53N2ttBImf6VSnxb7-CMVLXg2/pub?gid=0&single=true&output=csv').then( data=>{
@@ -62,14 +61,17 @@ d3.csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vRLUBo-PM3Qsh_JH0rloZozD
         let parseTime = d3.timeParse('%B %d, %Y at %I:%M%p')
         twd.forEach(element => {
            element.date = parseTime(element.datetime) 
-           element.r = element.text.length/10.0
-           element.x = xs(d.date)
+        //    element.r = element.text.length/10.0
+           element.r = Math.sqrt(element.text.length)
+           element.x = xs(element.date)
            element.y = -50
         });
+        callBirds()
+
     })
  
     callBirds = function() {
-        
+
             const isReply = function(d) {
                 return d.text.startsWith('@')
             }
@@ -93,13 +95,13 @@ d3.csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vRLUBo-PM3Qsh_JH0rloZozD
                 .style('stroke', '#999')
                 .style('stroke-width', '0')
                 .on('mouseover', function(d) {
-                    d3.select('#tweet-text').text(d.text).transition().duration(1000)
-                        .style('margin-top', '150px')
+                    d3.select('#tweet-text').text(d.text + d.date).transition().duration(1000)
+                        .style('top', '200px')
                     // d3.selectAll('.bird').style('z-index', e=> e == d ? 2: -1)
                     d3.select(this).raise().style('stroke-width', '2')
                 })
                 .on('mouseout', function(d) {
-                    d3.select('#tweet-text').transition().duration(1000).style('margin-top', '500px')
+                    d3.select('#tweet-text').transition().delay(600).duration(500).style('top', '-300px')
                     d3.select(this).style('stroke-width', '0')//.style('z-index', 0)
                 })
                 .on('click', d => {
@@ -107,14 +109,15 @@ d3.csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vRLUBo-PM3Qsh_JH0rloZozD
                 })
 
             simulation = d3.forceSimulation(twd)
-                .velocityDecay(0.2)
+                .velocityDecay(0.05)
                 .force("x", d3.forceX(d=>{ return xs(d.date) }))
-                .force("y", d3.forceY().strength(d => isReply(d) ? 0.02 : 0.2))
-                .force("collide", d3.forceCollide().radius(d => d.r - 1).iterations(2))
+                .force("y", d3.forceY().y(100).strength(d => isReply(d) ? 0.02 : 0.5))
+                .force("collide", d3.forceCollide().radius(d => d.r + 0).iterations(2))
                 .on("tick", function() {
                     d3.selectAll('.bird').attr('cx', d=>d.x).attr('cy', d=>d.y)
-                });
-
+                })
+                .tick(100)
+                
           
 
             // delay = 2.0
