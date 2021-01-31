@@ -4,6 +4,7 @@
     <title>Si Hammond</title>
     <link rel="stylesheet" type="text/css" href="/css/tailwind.css">
     <link rel="stylesheet" type="text/css" href="/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/css/ukiyo-e.css">
 
 
     <script src="https://kit.fontawesome.com/44dffe66e3.js" crossorigin="anonymous"></script>
@@ -18,23 +19,43 @@
         gtag('config', 'UA-154897229-1');
     </script>
 </head>
-<body class="bg-gray-200">
-<div class="container">
-    <div class="fixed p-6 max-w-sm mt-8 items-center space-x-4">
-        <div class="text-5xl pb-3 mx-5 font-medium">
+<body class="">
+<div class="flex top-bar">
+    <div class="flex-auto text-7xl py-3 mx-5 font-medium">
             <h1>Si <span class="font-extralight">Hammond</span></h1>
-        </div>
-            <div class="block space-x-2 pt-3">
-                <a href="https://twitter.com/sihammond" title="Twitter" onmouseover="callBirds()"><i class="fab fa-twitter fa-3x text-gray-600 hover:text-black"></i></a>
+    </div>
+     <div class="flex-auto md:text-2xl space-x-2 pt-3">
+                <a href="https://twitter.com/sihammond" title="Twitter"><i class="fab fa-twitter fa-3x text-gray-600 hover:text-black"></i></a>
                 <a href="https://www.facebook.com/simonhammond" title="Facebook"><i class="fab fa-facebook fa-3x text-gray-600 hover:text-black"></i></a>
                 <a href="https://www.linkedin.com/in/simonhammond/" title="LinkedIn"><i class="fab fa-linkedin fa-3x text-gray-600 hover:text-black"></i></a>
                 <a href="https://www.instagram.com/sixball/" title="Instagram"><i class="fab fa-instagram fa-3x text-gray-600 hover:text-black"></i></a>
                 <a href="http://github.com/shellsi"><i class="fab fa-github fa-3x text-gray-600 hover:text-black"></i></a>
             </div>
-        </div>
-    <svg id='landscape' style="height: 1000px; width:2000px"></svg>
-        <div id="tweet-text"></div>
+    </div>
+</div>
+<div class="block">
+    <svg id='landscape'>
+        <defs>
+            <linearGradient id="sky-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%"   stop-color="#bf8960"/>
+            <stop offset="30%" stop-color="#dbcfa5"/>
+            <stop offset="70%" stop-color="#dbcfa5"/>
+            <stop offset="100%" stop-color="#6c7a79"/>
+            </linearGradient>
 
+            <linearGradient id="red-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%"  stop-color="#35302a"/>
+            <stop offset="30%" stop-color="#ac8371"/>
+            </linearGradient>
+
+            <linearGradient id="green-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%"  stop-color="#697164"/>
+            <stop offset="100%" stop-color="#b0a89d"/>
+            </linearGradient>
+        </defs>
+        <g>
+    </svg>
+    <div id="tweet-text"></div>
     <div id="big-date"></div>
 </div>
 <script src="/js/d3.v5.min.js"></script>

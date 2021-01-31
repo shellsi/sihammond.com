@@ -1,141 +1,199 @@
 var scalesParseTime = d3.timeParse("%d/%m/%Y %H:%M:%S");
-var w = 2000
-var h = 1000
-var xs = d3.scaleTime().domain([scalesParseTime("11/10/2012 00:00:00").getTime(), Date.now()]).range([0, w])
+var tf = d3.timeFormat('%d %b %Y')
+
 var margin = {'top': 200}
+var w, h
+
 var date280 = new Date('7 November 2017')
 
+let viewport = d3.select('#landscape').select('g')
 
-d3.csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vRLUBo-PM3Qsh_JH0rloZozDUFQJn8x4zZOI5R_Qm-_qz5zVDZ2AmPKGlTEoZnYJkPBccFpGg4ImDs7/pub?gid=2&single=true&output=csv').then(w=>{
-        console.log(w)
+windowResized = function() {
+    // w = window.innerWidth
+    // h = window.innerHeight
 
-        d3.select("#landscape").style('height', h + margin.top).style('width', w)
+    w = d3.select('svg').node().clientWidth
+    // h = d3.select('svg').node().clientHeight
+    h = w
+    d3.select('svg').style('height', h)
 
-        let ys = d3.scaleLinear().domain([40, 80]).range([h, margin.top])
-        
-        let fn = d3.area()
-        .y0(d=>ys(d['Weight kg']))
+
+    xs = d3.scaleTime().domain([scalesParseTime("11/10/2012 00:00:00").getTime(), Date.now()]).range([0, w])
+    ys = d3.scaleLinear().domain([40, 80]).range([h, margin.top])
+
+    // fn = d3.area()
+    //     .y0(d=>ys(d['Weight kg']))
+    //     .x0(d=>{ return xs(scalesParseTime(d['Date']).getTime()) })
+    //     .y1(d=>ys(40))
+    //     .curve(d3.curveCatmullRom)
+    
+    fn_w = d3.area()
+        // .y0(d=>ys(d['Weight kg']-(d['Fat %']*d['Weight kg']/100.0)))
+        // .y0(d=>ys(d['Weight kg']-(d['Fat %'])))
+        .y0(h)
+
         .x0(d=>{ return xs(scalesParseTime(d['Date']).getTime()) })
-        .y1(d=>ys(40))
+        .y1(d=>ys(d['Weight kg']))
         .curve(d3.curveCatmullRom)
+}
 
-        d3.select('#landscape').append('path').attr('d', fn(w))   
+loadData = function() {
+    d3.csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vRLUBo-PM3Qsh_JH0rloZozDUFQJn8x4zZOI5R_Qm-_qz5zVDZ2AmPKGlTEoZnYJkPBccFpGg4ImDs7/pub?gid=2&single=true&output=csv').then(data=>{
+            scales = data
+            // viewport.on('mousemove', function(e) {
+            //     d3.select('#big-date').text(tf(xs.invert(d3.event.x)))
+            // })
 
-        let fn_w = d3.area()
-            .y0(d=>ys(d['Weight kg']-(d['Fat %']*d['Weight kg']/100.0)))
-            .x0(d=>{ return xs(scalesParseTime(d['Date']).getTime()) })
-            .y1(d=>ys(d['Weight kg']))
-            .curve(d3.curveCatmullRom)
+            // landscapeRender()
+        // })
 
-        d3.select('#landscape').append('path').attr('d', fn_w(w)).style('fill', 'grey')
+        d3.csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vTylGf2sPc5uFiAsXnCR6QarCBu73yJiJ32_uvV3Z0JvB-FauMhsEx53N2ttBImf6VSnxb7-CMVLXg2/pub?gid=0&single=true&output=csv').then( data=>{
+            twd = data
+            let parseTime = d3.timeParse('%B %d, %Y at %I:%M%p')
+            twd.forEach(element => {
+                element.date = parseTime(element.datetime) 
+                //    element.r = element.text.length/10.0
+                element.r = Math.sqrt(element.text.length)*0.7
+                element.x = xs(element.date)
+                element.y = Math.random() * h
+            });
+            landscapeRender()
 
-        d3.select('#landscape').on('mousemove', function(e) {
-            tf = d3.timeFormat('%d %b %Y')
-        d3.select('#big-date').text(tf(xs.invert(d3.event.x)))
+            // callBirds()
+            // plantTrees()
+        })
+    })
+    }
 
-            // console.log(e)
+highlandMin = function() {
+    return ys(Math.min(...scales.map(s=>+s['Weight kg'])))
+}
+
+lowlandMin = function() {
+
+    if(typeof scales == "undefined") return
+    return ys(Math.min(...scales.map(d=>ys(d['Weight kg']-(d['Fat %'])))))
+}
+
+landscapeRender = function() {
+    viewport.selectAll('*').remove()
+
+    viewport.append('rect').style('fill', 'url(#sky-grad)')
+        .attr('x', 0).attr('width', w).attr('y', 0)
+        .attr('height', ys(Math.min(...scales.map(s=>+s['Weight kg'])))) 
+
+    viewport.append('path').attr('d', fn_w(scales)).style('fill', 'url(#red-grad)').style('stroke', 'black').style('stroke-width', '0.5')
+
+    plantTrees()
+    // viewport.append('path').attr('d', fn(scales)).style('fill', 'url(#red-grad)')//.style('stroke', 'black')//.style('stroke-width', '0.5')
+
+}
+            
+plantTrees = function() {
+    const isReply = function(d) {
+        return d.text.startsWith('@')
+    }
+
+    treePath = d3.symbol().type(d3.symbolTriangle).size(100)()
+
+    trees = viewport.selectAll('.tree')
+        .data(twd)
+        .enter()
+        .append('path')
+        .attr('y', Math.random() * h)
+
+        // .attr('x', d=>{ return xs(d.date) })
+        .attr('x', d=>{ return xs(d.date)})
+
+        .attr('class', 'tree')
+        .attr('d', d=>d3.symbol().type(d3.symbolTriangle).size(d.text.length)())
+        
+        // .style('fill', d=>d.text.startsWith('@') ? 'rgba(255, 255, 255, 0.4)': 'rgba(255, 255, 255, 1.0)')
+        .style('fill', d=>d.text.startsWith('@') ? 'rgba(68, 73, 75, 0.4)': 'rgba(68, 73, 75, 1.0)')
+
+        .style('stroke', '#ddd')
+        .style('stroke-width', '0')
+        .on('mouseover', function(d) {
+            d3.select('#tweet-text').text(d.text)
+                .transition().duration(400)
+                .style('opacity', 1.0)
+            d3.select(this).raise().style('stroke-width', '2')
+
+            d3.select('#tweet-text').on('click', _ => {
+                window.open(d.url)
+            })
+        })
+        .on('mouseout', function(d) {
+            d3.select('#tweet-text').transition().delay(600).duration(500).style('opacity', 0)//.style('top', h + 'px')
+            d3.select(this).style('stroke-width', '0')//.style('z-index', 0)
         })
 
-        // let fn_m = d3.area()
-        //     .y0(d=>ys(d['Weight kg']+(d['Muscle %']*d['Weight kg']/100.0)))
-        //     .x0(d=>{ return xs(parseTime(d['Date']).getTime()) })
-        //     .y1(d=>ys(d['Weight kg']))
-        //     .curve(d3.curveCatmullRom);
+        trees.raise()
 
-        // d3.select('#g').append('path').attr('d', fn_m(w)).style('fill', 'red')
+        treeline = lowlandMin()
 
-        // for(d of w){
-        //     // console.log(d)
-        //     d3.select('#g').append('circle')
-        //     .attr('cy', ys(d['Weight kg']))
-        //     .attr('cx', xs(scalesParseTime(d['Date']).getTime()))
-        //     .attr("r", 6)
-        // }
-        // w.push({'Weight kg':60, 'Date': d3.timeFormat("%d/%m/%Y %H:%M:%S")(Date.now()), 'Fat %':0})
-        // w.push({'Weight kg':60, 'Date': w[0]['Date'], 'Fat %':0})
-        // w.push({'Weight kg':w[0]['Weight kg'], 'Date': w[0]['Date'], 'Fat %':0})
-    })
+    simulation = d3.forceSimulation(twd)
+        .velocityDecay(0.15)
+        .force("x", d3.forceX(d=>{ return xs(d.date) }).strength(0.5))
+        .force("y", d3.forceY(highlandMin() * 1.5).strength(d => isReply(d) ? 0.2 : 0.5))
+        .force("collide", d3.forceCollide().radius(10).iterations(2))
+        .force("charge", d3.forceManyBody().strength(_=>{return -1.0 - Math.random()*5}))
+        .on("tick", function() {
+            d3.selectAll('.tree').attr('transform', d=>`translate(${d.x}, ${d.y})`)
+        })
+        .tick(150)
+}    
 
-    d3.csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vTylGf2sPc5uFiAsXnCR6QarCBu73yJiJ32_uvV3Z0JvB-FauMhsEx53N2ttBImf6VSnxb7-CMVLXg2/pub?gid=0&single=true&output=csv').then( data=>{
-        twd = data
-        let parseTime = d3.timeParse('%B %d, %Y at %I:%M%p')
-        twd.forEach(element => {
-           element.date = parseTime(element.datetime) 
-        //    element.r = element.text.length/10.0
-           element.r = Math.sqrt(element.text.length)
-           element.x = xs(element.date)
-           element.y = -50
-        });
-        callBirds()
+callBirds = function() {
+        const isReply = function(d) {
+            return d.text.startsWith('@')
+        }
 
-    })
- 
-    callBirds = function() {
+        birds = viewport.selectAll('.bird')
+            .data(twd)
+            .enter()
+            .append('circle')
+            .attr('cy', Math.random() * h)
 
-            const isReply = function(d) {
-                return d.text.startsWith('@')
-            }
+            // .attr('x', d=>{ return xs(d.date) })
+            .attr('cx', d=>{ return xs(d.date)})
 
-            birds = d3.select('#landscape').selectAll('.bird')
-                .data(twd)
-                .enter()
-                .append('circle')
-                .attr('cy', -100)
+            // .attr('r', 3)
+            // .attr('r', d=>d.text.length/60.0)
+            .attr('r', d=>d.r)
+            .attr('class', 'bird')
 
+            .style('fill', d=>d.text.startsWith('@') ? 'rgba(255, 255, 255, 0.4)': 'rgba(255, 255, 255, 1.0)')
+            .style('stroke', '#999')
+            .style('stroke-width', '0')
+            .on('mouseover', function(d) {
+                d3.select('#tweet-text').text(d.text)
+                    .transition().duration(1000)
+                    .style('top', '200px')
+                // d3.selectAll('.bird').style('z-index', e=> e == d ? 2: -1)
+                d3.select(this).raise().style('stroke-width', '2')
 
-                // .attr('x', d=>{ return xs(d.date) })
-                .attr('cx', d=>{ return d.x })
-
-                // .attr('r', 3)
-                // .attr('r', d=>d.text.length/60.0)
-                .attr('r', d=>d.r)
-                .attr('class', 'bird')
-
-                .style('fill', d=>d.text.startsWith('@') ? 'rgba(255, 255, 255, 0.4)': 'rgba(255, 255, 255, 1.0)')
-                .style('stroke', '#999')
-                .style('stroke-width', '0')
-                .on('mouseover', function(d) {
-                    d3.select('#tweet-text').text(d.text + d.date).transition().duration(1000)
-                        .style('top', '200px')
-                    // d3.selectAll('.bird').style('z-index', e=> e == d ? 2: -1)
-                    d3.select(this).raise().style('stroke-width', '2')
-                })
-                .on('mouseout', function(d) {
-                    d3.select('#tweet-text').transition().delay(600).duration(500).style('top', '-300px')
-                    d3.select(this).style('stroke-width', '0')//.style('z-index', 0)
-                })
-                .on('click', d => {
+                d3.select('#tweet-text').on('click', _ => {
                     window.open(d.url)
                 })
+            })
+            .on('mouseout', function(d) {
+                d3.select('#tweet-text').transition().delay(600).duration(500).style('top', h + 'px')
+                d3.select(this).style('stroke-width', '0')//.style('z-index', 0)
+            })
 
-            simulation = d3.forceSimulation(twd)
-                .velocityDecay(0.05)
-                .force("x", d3.forceX(d=>{ return xs(d.date) }))
-                .force("y", d3.forceY().y(100).strength(d => isReply(d) ? 0.02 : 0.5))
-                .force("collide", d3.forceCollide().radius(d => d.r + 0).iterations(2))
-                .on("tick", function() {
-                    d3.selectAll('.bird').attr('cx', d=>d.x).attr('cy', d=>d.y)
-                })
-                .tick(100)
-                
-          
-
-            // delay = 2.0
-            // duration = 1000.0
-            // birds // fly in
-            //     .transition()
-            //     .duration((_,i)=>duration + Math.random()*500)
-            //     // .delay((d,i)=>delay / d.text.length - i)
-            //     // .delay((d,i)=>delay * (twd.length - i))
-            //     .delay((d,i)=>delay * i)
-
-            //     .attr('cx', d=>{
-            //         return xs(d.date)
-            //     })
-
-
-                // .attr('cy', d=>d.text.length + 350)
-                // .style('fill', d=>d.text.startsWith('@') ? 'transparent': '#fff')
-                // .style('stroke', '#555')
-                // .style('stroke-width', '1').attr('r', d=>d.text.length/25.0).style('opacity', d=>(d.text.length+55)/200.0)
-    }
+        simulation = d3.forceSimulation(twd)
+            .velocityDecay(0.9)
+            .force("x", d3.forceX(d=>{ return xs(d.date) }).strength(0.5))
+            .force("y", d3.forceY().y(100).strength(d => isReply(d) ? 0.02 : 0.1))
+            // .force("collide", d3.forceCollide().radius(d => d.r + 0).iterations(2))
+            .force("charge", d3.forceManyBody().strength(-10))
+            .on("tick", function() {
+                d3.selectAll('.bird').attr('cx', d=>d.x).attr('cy', d=>d.y)
+            })
+            .tick(120)
+        }
+    
+windowResized()
+window.onresize = function() { windowResized(); landscapeRender() }
+loadData()
