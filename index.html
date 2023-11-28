@@ -14,48 +14,29 @@
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-
         gtag('config', 'UA-154897229-1');
     </script>
 </head>
-<body class="">
-<div class="flex top-bar">
-    <div class="flex-auto text-7xl py-3 mx-5 font-medium">
+<body>
+<div class="flex text-center">
+    <div class="flex-auto text-8xl py-3 mx-5 font-medium">
             <h1>Si <span class="font-extralight">Hammond</span></h1>
     </div>
-     <div class="flex-auto md:text-2xl space-x-2 pt-3">
-                <a href="https://twitter.com/sihammond" title="Twitter"><i class="fab fa-twitter fa-3x text-gray-600 hover:text-black"></i></a>
+</div>
+<div class="flex text-center">
+     <div class="flex-auto md:text-2xl space-x-2 py-3">
+                <a href="https://www.mas.to/@sihammond" title="Mastodon"><i class="fab fa-mastodon fa-3x text-gray-600 hover:text-black"></i></a>
                 <a href="https://www.facebook.com/simonhammond" title="Facebook"><i class="fab fa-facebook fa-3x text-gray-600 hover:text-black"></i></a>
                 <a href="https://www.linkedin.com/in/simonhammond/" title="LinkedIn"><i class="fab fa-linkedin fa-3x text-gray-600 hover:text-black"></i></a>
                 <a href="https://www.instagram.com/sixball/" title="Instagram"><i class="fab fa-instagram fa-3x text-gray-600 hover:text-black"></i></a>
+                <a href="https://www.goodreads.com/sihammond" title="Goodreads"><i class="fab fa-goodreads fa-3x text-gray-600 hover:text-black"></i></a>
                 <a href="http://github.com/shellsi"><i class="fab fa-github fa-3x text-gray-600 hover:text-black"></i></a>
+                <a href="https://twitter.com/sihammond" title="Twitter (unstable)"><i class="fab fa-twitter fa-3x text-gray-600 hover:text-black"></i></a>
             </div>
     </div>
 </div>
-<div class="block">
-    <svg id='landscape'>
-        <defs>
-            <linearGradient id="sky-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%"   stop-color="#bf8960"/>
-            <stop offset="30%" stop-color="#dbcfa5"/>
-            <stop offset="70%" stop-color="#dbcfa5"/>
-            <stop offset="100%" stop-color="#6c7a79"/>
-            </linearGradient>
-
-            <linearGradient id="red-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%"  stop-color="#35302a"/>
-            <stop offset="30%" stop-color="#ac8371"/>
-            </linearGradient>
-
-            <linearGradient id="green-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%"  stop-color="#697164"/>
-            <stop offset="100%" stop-color="#b0a89d"/>
-            </linearGradient>
-        </defs>
-        <g>
-    </svg>
-    <div id="tweet-text"></div>
-    <div id="big-date"></div>
+<div class="block flex-auto">
+    <iframe width="100%" height="50%" style="background:#f9f9f9;" src="https://nomadlist.com/@sixball/embed" scrolling="no" frameborder="0" allowfullscreen></iframe>
 </div>
 <script src="/js/d3.v5.min.js"></script>
 <script src="/js/main.js"></script>
