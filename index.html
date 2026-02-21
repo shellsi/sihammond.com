@@ -1,63 +1,681 @@
-<html lang="en-GB">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Si Hammond</title>
-    <link rel="stylesheet" type="text/css" href="/css/tailwind.css">
-    <link rel="stylesheet" type="text/css" href="/css/main.css">
-    <link rel="stylesheet" type="text/css" href="/css/ukiyo-e.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Si Hammond — AI Contractor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-154897229-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-154897229-1');
+  </script>
 
-    <script src="https://kit.fontawesome.com/44dffe66e3.js" crossorigin="anonymous"></script>
+  <style>
+    /* ── Reset & Base ─────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-154897229-1"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'UA-154897229-1');
-    </script>
+    :root {
+      --ink:      #0f2339;
+      --teal:     #1a4a4a;
+      --teal-mid: #235f5f;
+      --amber:    #c17b2a;
+      --cream:    #f5f1eb;
+      --warm-white: #faf8f5;
+      --text:     #1c2b2b;
+      --muted:    #5a6e6e;
+      --border:   #d4cfc8;
 
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            margin: 0;
-        }
-        #top-section {
-            flex: 0 0 auto;
-        }
-        #nomad-globe {
-            flex: 1;
-        }
-    </style>
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body:    'DM Sans', system-ui, sans-serif;
+
+      --max:  1100px;
+      --gutter: clamp(1.5rem, 5vw, 4rem);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--warm-white);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-weight: 300;
+      line-height: 1.7;
+      font-size: 1.05rem;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::selection { background: var(--amber); color: white; }
+
+    /* ── Nav ──────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem var(--gutter);
+      background: rgba(250, 248, 245, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.3s;
+    }
+    nav.scrolled { border-color: var(--border); }
+
+    .nav-name {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: 0.01em;
+      text-decoration: none;
+    }
+
+    .nav-cta {
+      display: inline-block;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--teal);
+      color: var(--teal);
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: background 0.2s, color 0.2s;
+    }
+    .nav-cta:hover { background: var(--teal); color: white; }
+
+    /* ── Shared ───────────────────────────────────── */
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 var(--gutter);
+    }
+
+    section { padding: 6rem 0; }
+
+    .section-label {
+      font-family: var(--font-body);
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 1.5rem;
+    }
+
+    h2.section-heading {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.15;
+      margin-bottom: 2.5rem;
+    }
+
+    /* Fade-in on scroll */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* ── Hero ─────────────────────────────────────── */
+    #hero {
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-top: 7rem;
+      padding-bottom: 4rem;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Subtle background texture */
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 80% 40%, rgba(26, 74, 74, 0.05) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 10% 80%, rgba(193, 123, 42, 0.04) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 1.75rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.1s forwards;
+    }
+
+    h1.hero-name {
+      font-family: var(--font-display);
+      font-size: clamp(3.5rem, 10vw, 8rem);
+      font-weight: 700;
+      line-height: 0.95;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.2s forwards;
+    }
+
+    .hero-tagline {
+      font-family: var(--font-display);
+      font-size: clamp(1.4rem, 3.5vw, 2.4rem);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--teal);
+      line-height: 1.25;
+      max-width: 680px;
+      margin-bottom: 1.25rem;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.35s forwards;
+    }
+
+    .hero-sub {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 560px;
+      line-height: 1.65;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.5s forwards;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.65s forwards;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      padding: 0.85rem 2rem;
+      background: var(--teal);
+      color: white;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { background: var(--teal-mid); transform: translateY(-1px); }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.85rem 0;
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-decoration: none;
+      border-bottom: 1px solid var(--ink);
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .btn-ghost:hover { color: var(--amber); border-color: var(--amber); }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(20px); }
+    }
+
+    /* ── What I Bring ────────────────────────────── */
+    #what {
+      background: var(--cream);
+    }
+
+    .capabilities-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 3rem 4rem;
+      margin-top: 1rem;
+    }
+
+    .capability h3 {
+      font-family: var(--font-display);
+      font-size: 1.45rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .capability p {
+      color: var(--muted);
+      font-size: 0.975rem;
+      line-height: 1.75;
+    }
+
+    /* ── Background ──────────────────────────────── */
+    #background {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .background-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: start;
+    }
+
+    @media (max-width: 700px) {
+      .background-inner { grid-template-columns: 1fr; gap: 3rem; }
+    }
+
+    .background-text p {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.8;
+    }
+
+    .credentials {
+      padding-top: 0.5rem;
+    }
+
+    .credential-group {
+      margin-bottom: 2rem;
+    }
+
+    .credential-group-label {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 0.75rem;
+    }
+
+    .credential-list {
+      list-style: none;
+    }
+
+    .credential-list li {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      color: var(--ink);
+      padding: 0.4rem 0;
+      border-bottom: 1px solid var(--border);
+      line-height: 1.4;
+    }
+
+    .credential-list li:last-child { border-bottom: none; }
+
+    .credential-list .role-sub {
+      display: block;
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      font-weight: 300;
+      color: var(--muted);
+      margin-top: 0.1rem;
+    }
+
+    /* ── Sectors ─────────────────────────────────── */
+    #sectors { background: var(--cream); }
+
+    .sectors-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 0;
+      border: 1px solid var(--border);
+      margin-top: 1rem;
+    }
+
+    .sector {
+      padding: 2.5rem 2rem;
+      border-right: 1px solid var(--border);
+    }
+
+    .sector:last-child { border-right: none; }
+
+    @media (max-width: 700px) {
+      .sector { border-right: none; border-bottom: 1px solid var(--border); }
+      .sector:last-child { border-bottom: none; }
+    }
+
+    .sector-number {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--border);
+      line-height: 1;
+      margin-bottom: 0.75rem;
+    }
+
+    .sector h3 {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+    }
+
+    .sector p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ── Work ────────────────────────────────────── */
+    #work { border-top: 1px solid var(--border); }
+
+    .work-list {
+      margin-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .work-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: baseline;
+      gap: 2rem;
+      padding: 1.75rem 0;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      transition: opacity 0.2s;
+    }
+    .work-item:hover { opacity: 0.7; }
+    .work-item:hover .work-arrow { transform: translateX(4px); }
+
+    .work-title {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 0.25rem;
+    }
+
+    .work-desc {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .work-arrow {
+      font-size: 1.2rem;
+      color: var(--amber);
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+
+    .work-more {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 2rem;
+      color: var(--teal);
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-decoration: none;
+      border-bottom: 1px solid var(--teal);
+      padding-bottom: 2px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .work-more:hover { color: var(--amber); border-color: var(--amber); }
+
+    /* ── Contact ─────────────────────────────────── */
+    #contact {
+      background: var(--teal);
+      color: white;
+      padding: 7rem 0;
+    }
+
+    #contact .section-label { color: rgba(255,255,255,0.5); }
+
+    #contact h2.section-heading {
+      color: white;
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+    }
+
+    .contact-body {
+      max-width: 560px;
+      color: rgba(255,255,255,0.75);
+      font-size: 1.05rem;
+      line-height: 1.75;
+      margin-bottom: 2.5rem;
+    }
+
+    .contact-email {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      font-weight: 600;
+      color: white;
+      text-decoration: none;
+      border-bottom: 2px solid var(--amber);
+      padding-bottom: 2px;
+      transition: color 0.2s, border-color 0.2s;
+      display: inline-block;
+      margin-bottom: 1.75rem;
+    }
+    .contact-email:hover { color: var(--amber); }
+
+    .contact-linkedin {
+      display: block;
+      font-size: 0.875rem;
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      letter-spacing: 0.03em;
+      transition: color 0.2s;
+    }
+    .contact-linkedin:hover { color: rgba(255,255,255,0.85); }
+
+    /* ── Footer ──────────────────────────────────── */
+    footer {
+      padding: 1.5rem var(--gutter);
+      border-top: 1px solid rgba(255,255,255,0.1);
+      background: var(--teal);
+      display: flex;
+      justify-content: center;
+    }
+
+    footer p {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.03em;
+    }
+  </style>
 </head>
-<body style="display: flex; flex-direction: column; height: 100vh; margin: 0;">
-    <div id="top-section">
-        <div class="flex text-center">
-            <div class="flex-auto text-5xl md:text-8xl py-3 mx-5 font-medium">
-                    <h1>Si <span class="font-extralight">Hammond</span></h1>
-            </div>
-        </div>
-        <div class="flex text-center">
-            <div class="flex-auto md:text-2xl space-x-2 py-4">
-                        <a href="https://sihammond.medium.com/" title="Medium"><i class="fab fa-medium fa-2x text-gray-600 hover:text-black"></i></a>
-                        <a href="https://www.mas.to/@sihammond" title="Mastodon"><i class="fab fa-mastodon fa-2x text-gray-600 hover:text-black"></i></a>
-                        <a href="https://www.facebook.com/simonhammond" title="Facebook"><i class="fab fa-facebook fa-2x text-gray-600 hover:text-black"></i></a>
-                        <a href="https://www.linkedin.com/in/simonhammond/" title="LinkedIn"><i class="fab fa-linkedin fa-2x text-gray-600 hover:text-black"></i></a>
-                        <a href="https://www.instagram.com/sixball/" title="Instagram"><i class="fab fa-instagram fa-2x text-gray-600 hover:text-black"></i></a>
-                        <a href="https://www.goodreads.com/sihammond" title="Goodreads"><i class="fab fa-goodreads fa-2x text-gray-600 hover:text-black"></i></a>
-                        <a href="http://github.com/shellsi"><i class="fab fa-github fa-2x text-gray-600 hover:text-black"></i></a>
-                    </div>
-            </div>
-        </div>
+<body>
+
+  <!-- ── Nav ─────────────────────────────────────── -->
+  <nav id="nav">
+    <a href="#" class="nav-name">Si Hammond</a>
+    <a href="mailto:si@shellsi.com" class="nav-cta">Get in touch</a>
+  </nav>
+
+  <!-- ── Hero ────────────────────────────────────── -->
+  <section id="hero">
+    <div class="container">
+      <p class="hero-eyebrow">Available for contract · UK Remote</p>
+      <h1 class="hero-name">Si Hammond</h1>
+      <p class="hero-tagline">AI that works in the real world.</p>
+      <p class="hero-sub">Senior AI contractor. PhD. Clinical AI, GenAI systems, and full-stack builds — for health, education, and the rare problem worth solving.</p>
+      <div class="hero-actions">
+        <a href="mailto:si@shellsi.com" class="btn-primary">Get in touch</a>
+        <a href="https://shellsi.com" target="_blank" rel="noopener" class="btn-ghost">See my work →</a>
+      </div>
     </div>
-    <div id="nomad-globe" class="block flex-auto" style="flex: 1;">
-        <iframe width="100%" height="100%" style="background:#f9f9f9;" src="https://nomadlist.com/@sixball/embed" scrolling="no" frameborder="0" allowfullscreen></iframe>
+  </section>
+
+  <!-- ── What I Bring ─────────────────────────────── -->
+  <section id="what">
+    <div class="container">
+      <p class="section-label reveal">Capabilities</p>
+      <h2 class="section-heading reveal reveal-delay-1">What I bring</h2>
+      <div class="capabilities-grid">
+        <div class="capability reveal reveal-delay-1">
+          <h3>Applied AI & GenAI</h3>
+          <p>I build GenAI systems that actually get deployed — RAG pipelines, agentic workflows, structured outputs, and the evaluation frameworks that tell you whether they're working. I've been doing this since before the current gold rush.</p>
+        </div>
+        <div class="capability reveal reveal-delay-2">
+          <h3>Clinical & Health AI</h3>
+          <p>I've worked inside a clinical AI startup from prototype through to paid trials. I understand the regulatory context (MHRA, NHS governance), the real-world constraints, and the difference between a demo that impresses and a system a clinician will actually trust.</p>
+        </div>
+        <div class="capability reveal reveal-delay-3">
+          <h3>Full-Stack & Prototyping</h3>
+          <p>I can take an AI idea from architecture through to a working web application. Python backends, modern JS frontends, data pipelines, knowledge graphs — I've built and shipped all of it, often as a team of one.</p>
+        </div>
+      </div>
     </div>
-<script src="/js/d3.v5.min.js"></script>
-<script src="/js/main.js"></script>
+  </section>
+
+  <!-- ── Background ───────────────────────────────── -->
+  <section id="background">
+    <div class="container">
+      <div class="background-inner">
+        <div class="background-text reveal">
+          <p class="section-label">Background</p>
+          <h2 class="section-heading">Fifteen years building AI systems that ship.</h2>
+          <p>My PhD in Evolutionary Computation gave me a grounding in optimisation and search that turns out to be surprisingly useful when building AI systems that need to do more than generate plausible text. I've spent the last fifteen years moving between data science, full-stack development, and — more recently — the fast-moving world of generative AI and agentic systems. I've worked in pre-seed startups, post-acquisition businesses, and everything in between.</p>
+        </div>
+        <div class="credentials reveal reveal-delay-1">
+          <div class="credential-group">
+            <p class="credential-group-label">Education</p>
+            <ul class="credential-list">
+              <li>PhD, Evolutionary Computation<span class="role-sub">University of Birmingham</span></li>
+              <li>MSc, Natural Computation<span class="role-sub">University of Birmingham</span></li>
+              <li>BSc, AI & Computer Science<span class="role-sub">University of Birmingham</span></li>
+            </ul>
+          </div>
+          <div class="credential-group">
+            <p class="credential-group-label">Experience</p>
+            <ul class="credential-list">
+              <li>Founder, ShellSi Ltd<span class="role-sub">Current</span></li>
+              <li>Machine Medicine<span class="role-sub">Clinical AI</span></li>
+              <li>WorkDigital<span class="role-sub">Chief Data Scientist</span></li>
+              <li>VONQ · Recruiting Brainfood<span class="role-sub">Data Science & Full-Stack</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Sectors ───────────────────────────────────── -->
+  <section id="sectors">
+    <div class="container">
+      <p class="section-label reveal">Focus areas</p>
+      <h2 class="section-heading reveal reveal-delay-1">Where I work</h2>
+      <div class="sectors-grid">
+        <div class="sector reveal reveal-delay-1">
+          <p class="sector-number">01</p>
+          <h3>Health & Clinical AI</h3>
+          <p>Healthcare is where the stakes are real. I'm drawn to problems where AI can reduce clinician burden, surface insights from messy clinical data, or help patients navigate complex systems — and where the regulatory and safety constraints make the engineering genuinely hard.</p>
+        </div>
+        <div class="sector reveal reveal-delay-2">
+          <p class="sector-number">02</p>
+          <h3>Education & EdTech</h3>
+          <p>Education sits at the intersection of two things AI is genuinely good at: personalisation at scale, and making sense of complex unstructured data. There's significant work to be done here, and I'm interested in doing it.</p>
+        </div>
+        <div class="sector reveal reveal-delay-3">
+          <p class="sector-number">03</p>
+          <h3>Labour Market Intelligence</h3>
+          <p>I've spent years building tools that make sense of job markets, skills data, and career trajectories. It's a domain I know deeply — and one where AI is creating both new possibilities and new responsibilities.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Work ─────────────────────────────────────── -->
+  <section id="work">
+    <div class="container">
+      <p class="section-label reveal">Portfolio</p>
+      <h2 class="section-heading reveal reveal-delay-1">Selected work</h2>
+      <div class="work-list">
+        <a href="https://shellsi.com" target="_blank" rel="noopener" class="work-item reveal">
+          <div>
+            <p class="work-title">OnVocation</p>
+            <p class="work-desc">A continuously-updated database of 2M+ tech jobs, mined for skill associations and presented through custom interactive visualisations.</p>
+          </div>
+          <span class="work-arrow">→</span>
+        </a>
+        <a href="https://shellsi.com" target="_blank" rel="noopener" class="work-item reveal reveal-delay-1">
+          <div>
+            <p class="work-title">Parkinson's Disease Evaluation</p>
+            <p class="work-desc">Mobile MVP for clinical-grade pose estimation at Machine Medicine — prototype that underpinned the first round of paid clinical trials.</p>
+          </div>
+          <span class="work-arrow">→</span>
+        </a>
+        <a href="https://shellsi.com" target="_blank" rel="noopener" class="work-item reveal reveal-delay-2">
+          <div>
+            <p class="work-title">ShellSi Memory Platform</p>
+            <p class="work-desc">A generative AI system for capturing and enriching family memories across generations. Currently in development.</p>
+          </div>
+          <span class="work-arrow">→</span>
+        </a>
+      </div>
+      <a href="https://shellsi.com" target="_blank" rel="noopener" class="work-more reveal">
+        Full portfolio at shellsi.com →
+      </a>
+    </div>
+  </section>
+
+  <!-- ── Contact ───────────────────────────────────── -->
+  <section id="contact">
+    <div class="container">
+      <p class="section-label reveal">Contact</p>
+      <h2 class="section-heading reveal reveal-delay-1">Let's talk</h2>
+      <p class="contact-body reveal reveal-delay-2">I'm currently available for senior AI contract work — particularly in health, education, and adjacent domains. Remote, UK-based. If you have a problem worth solving, I'd like to hear about it.</p>
+      <a href="mailto:si@shellsi.com" class="contact-email reveal reveal-delay-2">si@shellsi.com</a>
+      <a href="https://linkedin.com/in/simonhammond" target="_blank" rel="noopener" class="contact-linkedin reveal reveal-delay-3">
+        LinkedIn → linkedin.com/in/simonhammond
+      </a>
+    </div>
+  </section>
+
+  <!-- ── Footer ────────────────────────────────────── -->
+  <footer>
+    <p>Si Hammond · ShellSi Ltd · Registered in England &amp; Wales</p>
+  </footer>
+
+  <script>
+    // Nav scroll state
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(el => observer.observe(el));
+  </script>
+
 </body>
 </html>
